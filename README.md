@@ -1,22 +1,21 @@
 # UPS Battery Monitor
 
-Simple battery monitoring dashboard for Raspberry Pi. Reads voltage from an INA219 sensor on I2C, calculates percentage, serves a web dashboard and JSON API.
+Battery monitoring for Raspberry Pi using an INA219 sensor over I²C. It calculates battery percentage and provides a web dashboard and JSON API.
 
 ## Setup
 
 ```bash
-git clone https://github.com/yourusername/ups-battery-monitor
-cd ups-battery-monitor
+git clone https://github.com/dylanparsons/waveshare-ups-monitor.git
+cd waveshare-ups-monitor
 sudo chmod +x install.sh
 sudo ./install.sh
 ```
 
-Installs Python deps, enables I2C, copies files to `/usr/local/bin` and web root.
+The installer installs Python dependencies, enables I²C, and copies files to `/usr/local/bin` and the web root.
 
 ## Usage
 
-**Dashboard:**
-`http://your-pi/dashboard.html`
+**Dashboard:** open `http://your-pi/dashboard.html`
 
 **Command line:**
 ```bash
@@ -28,7 +27,7 @@ python3 /usr/local/bin/battery_monitor.py
 curl http://localhost/battery_status.php
 ```
 
-Returns:
+Example response:
 ```json
 {
   "voltage": 8.2,
@@ -39,48 +38,26 @@ Returns:
 
 ## Demo
 
-To preview the dashboard UI without hardware, open `demo.html` in a browser. Shows battery states cycling through good, low, and critical.
+Open `demo.html` to preview the dashboard without hardware. The demo cycles through good, low, and critical battery states.
 
 ## Configuration
 
-Edit `battery_monitor.py` to set your battery's empty/full voltage thresholds.
-
-Default assumes 4-cell setup (12V-16.8V). Adjust the `calculate_percentage()` function for your battery:
-
-```python
-# Example for 3-cell (9V-12.6V)
-empty = 3 * 3.0  # 9V
-full = 3 * 4.2   # 12.6V
-```
+Edit `battery_monitor.py` to set the battery's empty and full voltage thresholds. The defaults assume a four-cell pack (12–16.8 V). For a three-cell pack, use 9–12.6 V.
 
 ## Troubleshooting
 
-**Can't read voltage**
-
-Check I2C: `i2cdetect -y 1`
-
-Should show `42`. If nothing appears, verify connections or enable I2C in `raspi-config`.
-
-**Dashboard shows dashes**
-
-Test the script directly: `sudo python3 /usr/local/bin/battery_monitor.py`
-
-If that fails, I2C isn't connected. Check physical wiring.
-
-If script works but dashboard doesn't, verify `battery_status.php` can execute:
-```bash
-sudo usermod -aG i2c www-data
-sudo systemctl restart apache2
-```
+- If the sensor is not detected, check wiring, enable I²C in `raspi-config`, and run `i2cdetect -y 1`. The expected address is `0x42`.
+- If the dashboard shows dashes, run the monitor script directly to check sensor communication.
+- If the script works but the web API does not, check the web server's I²C permissions and restart Apache after changing group membership.
 
 ## Files
 
-- `battery_monitor.py` - INA219 driver
-- `battery_status.php` - JSON API endpoint
-- `dashboard.html` - Web UI
-- `style.css` - Styling
-- `demo.html` - Demo (no hardware required)
-- `install.sh` - Setup script
+- `battery_monitor.py` — INA219 monitoring
+- `battery_status.php` — JSON API endpoint
+- `dashboard.html` — Web dashboard
+- `style.css` — Dashboard styles
+- `demo.html` — Hardware-free dashboard demo
+- `install.sh` — Installer
 
 ## License
 
